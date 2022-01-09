@@ -1,5 +1,6 @@
 import mysql.connector
 from prettytable import PrettyTable
+import re
 
 
 def select2db():
@@ -21,32 +22,71 @@ def select2db():
     print(t)
 
 
+def checkField(fNum, val):
+    if fNum == 1:
+        if val.isnumeric():
+            return True
+        else:
+            print("page count must be Numeric (0-9)! (Error-4)")
+            return False
+    elif fNum == 2:
+        if val.isalpha():
+            return True
+        else:
+            print("genre must be alphabet letters (a-z) (Error-5)")
+            return False
+    elif fNum == 3:
+        result = re.search(r"^\d\.*\d*$", val)
+        if result and float(val) >= 0 and float(val) <= 5:
+            return True
+        else:
+            print("score must be Float and between 0.0 to 5.0 (Error-6)")
+            return False
+    elif fNum == 6:
+        result = re.search(r"^\d\.*\d*$", val)
+        if result:
+            return True
+        else:
+            print("price must be Float or Numeric (Error-7)")
+            return False
+    return True
+
+
 def insert2db():
     sql = "INSERT INTO book (name,pageCount,genre,score,author,isbn,price) VALUES ('{0}',{1},'{2}',{3},'{4}','{5}',{6})"
     value = input(
-        "Cool, Give those data in order :\n---------> Name - Page Count - Genre - Score (float between 0 to 5) - Author - ISBN - Price\n Separate them by '-' : "
+        "Cool, Give those data in order :\n---------> Name - Page Count - Genre - Score (float between 0.0 to 5.0) - Author - ISBN - Price\n Separate them by '-' : "
     )
     value = value.strip()
     value = value.split("-")
     value = tuple(map(lambda this: this.strip(), value))
     if len(value) > 7:
-        print("too many arguments! (Error-2)")
+        print("Too many Arguments! (Error-2)")
     elif len(value) < 7:
-        print("Please enter all information! (Error-3)")
+        print("All fields are required! (Error-3)")
     else:
-        dbcursor.execute(
-            sql.format(
-                value[0],
-                value[1],
-                value[2],
-                value[3],
-                value[4],
-                value[5],
-                value[6],
+        index = 0
+        everythingisok = True
+        while index <= 6:
+            thisField = value[index]
+            if not checkField(index, thisField):
+                everythingisok = False
+                break
+            index += 1
+        if everythingisok:
+            dbcursor.execute(
+                sql.format(
+                    value[0],
+                    value[1],
+                    value[2],
+                    value[3],
+                    value[4],
+                    value[5],
+                    value[6],
+                )
             )
-        )
-        bookStoreDB.commit()
-        print("The '%s' book Succesfully added to Database." % value[0])
+            bookStoreDB.commit()
+            print("The '%s' book Succesfully added to Database." % value[0])
 
 
 def displayBasedOnId():
@@ -77,12 +117,13 @@ def update2db():
         "Which attribute will you change?\n1 - Name\n2 - Page Count\n3 - Genre\n4 - Score\n5 - Author\n6 - ISBN\n7 - Price\n: "
     )
     value = input("Enter its value : ")
-    dbcursor.execute(sql % (columnName[column], value, selectedBook))
-    bookStoreDB.commit()
-    print(
-        "The '%s' book Succesfully updated on '%s' to value '%s' ."
-        % (SBName, columnName[column].capitalize(), value)
-    )
+    if checkField(int(column) - 1, value):
+        dbcursor.execute(sql % (columnName[column], value, selectedBook))
+        bookStoreDB.commit()
+        print(
+            "The '%s' book Succesfully updated on '%s' to value '%s' ."
+            % (SBName, columnName[column].capitalize(), value)
+        )
 
 
 def delete2db():
@@ -106,14 +147,18 @@ except:
 dbcursor = bookStoreDB.cursor()
 line = "========================================================================"
 print("%s\n%s\n%s" % (line, "Welcome to Book Store 📚".center(len(line)), line))
-task = input(
-    "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book 🔥\n3 - UPDATE book 📎\n4 - SELECT (View) book 🔦\n: "
-)
-if task == "1":
-    insert2db()
-elif task == "2":
-    delete2db()
-elif task == "3":
-    update2db()
-elif task == "4":
-    select2db()
+while True:
+    task = input(
+        "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book 🔥\n3 - UPDATE book 📎\n4 - SELECT (View) book 🔦\n: "
+    )
+    if task == "1":
+        insert2db()
+    elif task == "2":
+        delete2db()
+    elif task == "3":
+        update2db()
+    elif task == "4":
+        select2db()
+        input("Press Enter to return to menu")
+    else:
+        break
