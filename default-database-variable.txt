@@ -1,0 +1,6 @@
+Database : bookstore
+Username : bokstr
+Password : 1234
+Host : localhost
+
+# You can change it whatever you like but change it in the python after!
