@@ -10,7 +10,7 @@ def select2db():
         t.add_row(
             [
                 thisBook[0] + " 📖",
-                thisBook[1],
+                str(thisBook[1]) + " 📰",
                 thisBook[2] + " 📆",
                 str(thisBook[3]) + " 🏆",
                 thisBook[4],
@@ -49,17 +49,44 @@ def insert2db():
         print("The '%s' book Succesfully added to Database." % value[0])
 
 
-def update2db():
-    pass
-
-
-def delete2db():
+def displayBasedOnId():
     dbcursor.execute("SELECT id,name FROM book ORDER BY id")
     result = dbcursor.fetchall()
     t = PrettyTable(["Id", "Name"])
     for thisBook in result:
         t.add_row([thisBook[0], thisBook[1] + " 📖"])
     print(t)
+    return result
+
+
+def update2db():
+    result = displayBasedOnId()
+    columnName = {
+        "1": "name",
+        "2": "pageCount",
+        "3": "genre",
+        "4": "score",
+        "5": "author",
+        "6": "isbn",
+        "7": "price",
+    }
+    selectedBook = input("Which one will you update, enter its Id : ")
+    sql = "UPDATE book SET %s = '%s' WHERE id = %s"
+    SBName = [item[1] for item in result if str(item[0]) == selectedBook][0]
+    column = input(
+        "Which attribute will you change?\n1 - Name\n2 - Page Count\n3 - Genre\n4 - Score\n5 - Author\n6 - ISBN\n7 - Price\n: "
+    )
+    value = input("Enter its value : ")
+    dbcursor.execute(sql % (columnName[column], value, selectedBook))
+    bookStoreDB.commit()
+    print(
+        "The '%s' book Succesfully updated on '%s' to value '%s' ."
+        % (SBName, columnName[column].capitalize(), value)
+    )
+
+
+def delete2db():
+    result = displayBasedOnId()
     selectedBook = input("Which one will you delete, Enter its Id : ")
     sql = "DELETE FROM book WHERE id = %s"
     SBName = [item[1] for item in result if str(item[0]) == selectedBook][0]
