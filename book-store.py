@@ -1,11 +1,24 @@
 import mysql.connector
+from prettytable import PrettyTable
 
 
 def select2db():
-    dbcursore.execute("SELECT * FROM book")
+    dbcursore.execute("SELECT * FROM book ORDER BY name")
     result = dbcursore.fetchall()
+    t = PrettyTable(["Name", "Page Count", "Genre", "Score", "Author", "ISBN", "Price"])
     for thisBook in result:
-        print(thisBook)
+        t.add_row(
+            [
+                thisBook[0] + " 📖",
+                thisBook[1],
+                thisBook[2] + " 📆",
+                str(thisBook[3]) + " 🏆",
+                thisBook[4],
+                thisBook[5] + " ©",
+                str(thisBook[6]) + " 💲",
+            ]
+        )
+    print(t)
 
 
 def insert2db():
@@ -54,9 +67,9 @@ except:
 
 dbcursore = bookStoreDB.cursor()
 line = "========================================================================"
-print("%s\n%s\n%s" % (line, "Welcome to Book Store".center(len(line)), line))
+print("%s\n%s\n%s" % (line, "Welcome to Book Store 📚".center(len(line)), line))
 task = input(
-    "what will do? (Press anything else to exit)\n1 - INSERT book\n2 - DELETE book\n3 - UPDATE book\n4 - SELECT (View) book\n: "
+    "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book ✂\n3 - UPDATE book \n4 - SELECT (View) book 📜\n: "
 )
 if task == "1":
     insert2db()
@@ -66,4 +79,3 @@ elif task == "3":
     update2db()
 elif task == "4":
     select2db()
-
