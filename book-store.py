@@ -86,7 +86,7 @@ def insert2db():
                 )
             )
             bookStoreDB.commit()
-            print("The '%s' book Succesfully added to Database." % value[0])
+            print("The '%s' book successfully added to Database." % value[0])
 
 
 def displayBasedOnId():
@@ -121,7 +121,7 @@ def update2db():
         dbcursor.execute(sql % (columnName[column], value, selectedBook))
         bookStoreDB.commit()
         print(
-            "The '%s' book Succesfully updated on '%s' to value '%s' ."
+            "The '%s' book successfully updated on '%s' to value '%s' ."
             % (SBName, columnName[column].capitalize(), value)
         )
 
@@ -133,23 +133,30 @@ def delete2db():
     SBName = [item[1] for item in result if str(item[0]) == selectedBook][0]
     dbcursor.execute(sql % selectedBook)
     bookStoreDB.commit()
-    print("The '%s' book Succesfully removed from Database." % SBName)
+    print("The '%s' book successfully removed from Database." % SBName)
 
+
+def createTable():
+    sql = "CREATE TABLE book (name varchar(100),pageCount smallint,genre varchar(30),score float,author varchar(50),isbn varchar(20),price float,id INT AUTO_INCREMENT PRIMARY KEY);"
+    dbcursor.execute(sql)
+    print("book store Table successfully created.")
+
+
+# ====================================================================================================
 
 try:
     bookStoreDB = mysql.connector.connect(
         host="localhost", user="bokstr", password="1234", database="bookstore"
     )
+    dbcursor = bookStoreDB.cursor()
 except:
     print("we cant connect to the Mysql on localhost@bokstr@1234@bookstore (Error-1)")
 
-
-dbcursor = bookStoreDB.cursor()
 line = "========================================================================"
 print("%s\n%s\n%s" % (line, "Welcome to Book Store 📚".center(len(line)), line))
 while True:
     task = input(
-        "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book 🔥\n3 - UPDATE book 📎\n4 - SELECT (View) book 🔦\n: "
+        "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book 🔥\n3 - UPDATE book 📎\n4 - SELECT (View) book 🔦\n5 - CREATE table 📂\n: "
     )
     if task == "1":
         insert2db()
@@ -160,5 +167,7 @@ while True:
     elif task == "4":
         select2db()
         input("Press Enter to return to menu")
+    elif task == "5":
+        createTable()
     else:
         break
