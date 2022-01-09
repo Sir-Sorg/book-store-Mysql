@@ -3,8 +3,8 @@ from prettytable import PrettyTable
 
 
 def select2db():
-    dbcursore.execute("SELECT * FROM book ORDER BY name")
-    result = dbcursore.fetchall()
+    dbcursor.execute("SELECT * FROM book ORDER BY name")
+    result = dbcursor.fetchall()
     t = PrettyTable(["Name", "Page Count", "Genre", "Score", "Author", "ISBN", "Price"])
     for thisBook in result:
         t.add_row(
@@ -34,7 +34,7 @@ def insert2db():
     elif len(value) < 7:
         print("Please enter all information! (Error-3)")
     else:
-        dbcursore.execute(
+        dbcursor.execute(
             sql.format(
                 value[0],
                 value[1],
@@ -54,7 +54,18 @@ def update2db():
 
 
 def delete2db():
-    pass
+    dbcursor.execute("SELECT id,name FROM book ORDER BY id")
+    result = dbcursor.fetchall()
+    t = PrettyTable(["Id", "Name"])
+    for thisBook in result:
+        t.add_row([thisBook[0], thisBook[1] + " 📖"])
+    print(t)
+    selectedBook = input("Which one will you delete, Enter its Id : ")
+    sql = "DELETE FROM book WHERE id = %s"
+    SBName = [item[1] for item in result if str(item[0]) == selectedBook][0]
+    dbcursor.execute(sql % selectedBook)
+    bookStoreDB.commit()
+    print("The '%s' book Succesfully removed from Database." % SBName)
 
 
 try:
@@ -65,11 +76,11 @@ except:
     print("we cant connect to the Mysql on localhost@bokstr@1234@bookstore (Error-1)")
 
 
-dbcursore = bookStoreDB.cursor()
+dbcursor = bookStoreDB.cursor()
 line = "========================================================================"
 print("%s\n%s\n%s" % (line, "Welcome to Book Store 📚".center(len(line)), line))
 task = input(
-    "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book ✂\n3 - UPDATE book \n4 - SELECT (View) book 📜\n: "
+    "what will do? (Press anything else to exit)\n1 - INSERT book 💾\n2 - DELETE book 🔥\n3 - UPDATE book 📎\n4 - SELECT (View) book 🔦\n: "
 )
 if task == "1":
     insert2db()
