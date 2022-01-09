@@ -137,9 +137,14 @@ def delete2db():
 
 
 def createTable():
-    sql = "CREATE TABLE book (name varchar(100),pageCount smallint,genre varchar(30),score float,author varchar(50),isbn varchar(20),price float,id INT AUTO_INCREMENT PRIMARY KEY);"
-    dbcursor.execute(sql)
-    print("book store Table successfully created.")
+    try:
+        sql = "CREATE TABLE book (name varchar(100),pageCount smallint,genre varchar(30),score float,author varchar(50),isbn varchar(20),price float,id INT AUTO_INCREMENT PRIMARY KEY);"
+        dbcursor.execute(sql)
+        print("book store Table successfully created.")
+    except:
+        print(
+            "Table 'book' already exists or There was a problem Creating table! (Error-8)"
+        )
 
 
 # ====================================================================================================
